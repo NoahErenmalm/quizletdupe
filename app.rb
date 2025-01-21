@@ -7,3 +7,4 @@ require 'bcrypt'
 get('/') do
     slim(:home)
 end
+
