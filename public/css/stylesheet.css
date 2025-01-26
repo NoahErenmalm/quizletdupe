@@ -1,32 +1,22 @@
-img {
-    width: 50px;
-}
+
 header {
-    display: flex;
-    justify-content:space-between;
-    align-items: center;
-    margin-left: 2%;
-    margin-right: 5%;
+  display: flex;
+  justify-content:space-between;
+  align-items: center;
+  margin-left: 2%;
+  margin-right: 5%;
 }
 nav {
-    width: 40%;
-    min-width: 300px;
-    display: flex;
-    justify-content: space-between;
+  width: 40%;
+  min-width: 300px;
+  display: flex;
+  justify-content: space-between;
 }
 
-
-/*<!-- HTML !-->
-<button class="button-85" role="button">Button 85</button>
-
-/* CSS */
-.button {
+.header-button {
   padding: 0.6em 2em;
-  border: none;
-  outline: none;
   color: rgb(0, 0, 0);
   background: #ffffff;
-  cursor: pointer;
   position: relative;
   z-index: 0;
   border-radius: 10px;
@@ -36,7 +26,7 @@ nav {
   text-decoration: none;
 }
 
-.button:before {
+.header-button:before {
   content: "";
   background: linear-gradient(
     45deg,
@@ -59,12 +49,12 @@ nav {
   -webkit-filter: blur(5px);
   width: calc(100% + 4px);
   height: calc(100% + 4px);
-  animation: glowing-button-85 20s linear infinite;
+  animation: glowing-button 20s linear infinite;
   transition: opacity 0.3s ease-in-out;
   border-radius: 10px;
 }
 
-@keyframes glowing-button-85 {
+@keyframes glowing-button {
   0% {
     background-position: 0 0;
   }
@@ -76,7 +66,7 @@ nav {
   }
 }
 
-.button:after {
+.header-button:after {
   z-index: -1;
   content: "";
   position: absolute;
@@ -86,4 +76,90 @@ nav {
   left: 0;
   top: 0;
   border-radius: 10px;
+}
+
+.logo-div { 
+  position: relative;
+  width: 50px; /* Size of the logo */
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  object-fit: contain;
+  mix-blend-mode: screen; /* Blend the hollow logo with the RGB glow */
+  border-radius: 8px;
+}
+
+.logo-div::before {
+  content: "";
+  position: absolute;
+  top: -1px; /* Glowing area outside the logo */
+  left: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  background: linear-gradient(
+    45deg,
+    #ff0000,
+    #ff7300,
+    #fffb00,
+    #48ff00,
+    #00ffd5,
+    #002bff,
+    #7a00ff,
+    #ff00c8,
+    #ff0000
+  );
+  background-size: 400%;
+  z-index: 0;
+  filter: blur(6px); /* Glow effect */
+  animation: glowing 20s linear infinite;
+}
+
+.logo-div::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    #ff0000,
+    #ff7300,
+    #fffb00,
+    #48ff00,
+    #00ffd5,
+    #002bff,
+    #7a00ff,
+    #ff00c8,
+    #ff0000
+  );
+  background-size: 400%;
+  z-index: -1;
+  -webkit-mask: url("hollowquiz.png") center/contain no-repeat;
+  mask: url("hollowquiz.png") center/contain no-repeat;
+  animation: glowing 20s linear infinite;
+}
+
+@keyframes glowing {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 400% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+hr {
+  border-top: 1px solid #7a7a7a;
 }
