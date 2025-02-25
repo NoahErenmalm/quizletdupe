@@ -40,10 +40,10 @@ post('/logging') do
 
     user_data = db.execute("SELECT UserId, Username, Password FROM Users WHERE Username = ?", username).first
 
-    password_digest = BCrypt::Password.create(password)
+    
 
     if user_data != nil
-        if username == user_data["Username"] && password_digest == user_data["Password"]
+        if username == user_data["Username"] && BCrypt::Password.new(user_data["Password"]) == password
             session[:username] = user_data["Username"]
             session[:userId] = user_data["UserId"]
         else

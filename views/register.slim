@@ -1,8 +1,8 @@
 h3 Register
 form action="/registering" method="post" 
     input type="text" name="username" placeholder="Enter Username"
-    input# type="text" name="password" placeholder="Enter Password"/
-    input# type="text" name="password_confirm" placeholder="Confirm Password"/
+    input# type="password" name="password" placeholder="Enter Password"/
+    input# type="password" name="password_confirm" placeholder="Confirm Password"/
     input type="submit" value="register"
 - if session[:register_error]
     p =session[:register_error]
