@@ -13,5 +13,7 @@ html lang="en"
                 a class="header-button" href="" Home 
                 a class="header-button" href="" Skapa ny Quiz
                 a class="header-button" href="" Dina Quiz
+            - if session[:username] != nil
+                p = session[:username]
         hr/
         ==yield 

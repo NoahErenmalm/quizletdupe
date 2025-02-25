@@ -163,3 +163,7 @@ nav {
 hr {
   border-top: 1px solid #7a7a7a;
 }
+
+.error-text {
+  color: red;
+}

@@ -4,4 +4,6 @@ form action="/logging" method="post"
     input# type="text" name="password" placeholder="Enter Password"/
     input type="submit" value="login"/
     a href="/register" No Account?
-
+- if session[:login_error]
+    p class="error-text" =session[:login_error]
+    - session.delete(:login_error)
