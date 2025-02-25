@@ -8,10 +8,10 @@ html lang="en"
     body 
         header
             div class="logo-div"
-                img class="logo"src="img/hollowquiz.png" alt=""/
+                img class="logo"src="/img/hollowquiz.png" alt=""/
             nav 
                 a class="header-button" href="" Home 
-                a class="header-button" href="" Skapa ny Quiz
+                a class="header-button" href="/quiz/create" Skapa ny Quiz
                 a class="header-button" href="" Dina Quiz
             - if session[:username] != nil
                 p = session[:username]

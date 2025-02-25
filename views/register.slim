@@ -5,5 +5,4 @@ form action="/registering" method="post"
     input# type="password" name="password_confirm" placeholder="Confirm Password"/
     input type="submit" value="register"
 - if session[:register_error]
-    p =session[:register_error]
-    - session.delete(:register_error)
+    p =flash[:register_error]

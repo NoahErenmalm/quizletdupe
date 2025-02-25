@@ -167,3 +167,9 @@ hr {
 .error-text {
   color: red;
 }
+
+.quiz-create-meta-box {
+  display:flexbox;
+  height: 20px;
+
+}
