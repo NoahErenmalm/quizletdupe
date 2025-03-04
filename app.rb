@@ -8,6 +8,10 @@ require_relative './model.rb'
 
 enable :sessions
 
+before do
+    check_activity()
+end
+
 get('/') do
     slim(:index)
 end

@@ -1,4 +1,8 @@
+- if flash[:inactivity]
+    p.error-text =flash[:inactivity]
+
 h3 Login
+
 form action="/logging" method="post"
     input# type="text" name="username" placeholder="Enter Username"/
     input# type="password" name="password" placeholder="Enter Password"/

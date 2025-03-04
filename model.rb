@@ -21,6 +21,13 @@ def login(user_data)
     session[:userId] = user_data["UserId"]
 end
 
+def logout()
+    session[:userId] = nil
+    session[:username] = nil
+    session[:last_seen] = nil
+    redirect('/login')
+end
+
 def login_request(username, password, db)
     db.results_as_hash = true
     user_data = db.execute("SELECT UserId, Username, Password FROM Users WHERE Username = ?", username).first
@@ -35,5 +42,18 @@ def login_request(username, password, db)
     else
         flash[:login_error] = "Wrong password"  
         redirect('/login')
+    end
+end
+
+def check_activity()
+    if session[:userId] != nil
+        if session[:last_seen] == nil
+            session[:last_seen] = Time.now.to_i
+        elsif Time.now.to_i - session[:last_seen] > 30*60
+            session[:last_seen] = Time.now.to_i
+            flash[:inactivity] = "You have been logged out due to inactivity."
+            logout()
+        end
+        session[:last_seen] = Time.now.to_i
     end
 end
