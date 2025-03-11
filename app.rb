@@ -45,5 +45,17 @@ post('/logging') do
 end
 
 get('/quiz/create') do
-    slim(:quizcreation)
+    slim(:quizcreator)
+end
+
+post('/quiz/creating') do
+    
+    questions = params[:questions_text]
+    answers = params[:answers]
+    images = params[:question_image]
+
+
+    validate_quiz(questions, answers)
+
+    redirect('/')
 end

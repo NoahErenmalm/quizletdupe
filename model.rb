@@ -57,3 +57,23 @@ def check_activity()
         session[:last_seen] = Time.now.to_i
     end
 end
+
+def validate_quiz(questions, answers)
+
+    
+    if !questions || !answers || questions.empty? || answers.empty?
+        errors << "Quiz must contain one or more questions..."
+
+    else
+        questions.each_with_index do |question, i|
+            if question.strip.empty?
+                flash[:quiz_error] = "Question #{i+1} cannot be blank..."
+                redirect('/quiz/create')
+            end
+            if answers[i].strip.empty?
+                flash[:quiz_error] = "Answer #{i+1} cannot be blank..."
+                redirect('/quiz/create')
+            end
+        end
+    end
+end

@@ -168,8 +168,6 @@ hr {
   color: red;
 }
 
-.quiz-create-meta-box {
-  display:flexbox;
-  height: 20px;
-
+.quiz-create-question-box {
+  color: red;
 }
