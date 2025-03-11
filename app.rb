@@ -5,6 +5,7 @@ require 'sinatra/reloader'
 require 'sinatra/flash'
 require 'bcrypt'
 require_relative './model.rb'
+require 'securerandom'
 
 enable :sessions
 
@@ -49,13 +50,14 @@ get('/quiz/create') do
 end
 
 post('/quiz/creating') do
-    
+    db = SQLite3::Database.new('./db/database.db')
     questions = params[:questions_text]
     answers = params[:answers]
-    images = params[:question_image]
+    images = params[:questions_image]
 
 
-    validate_quiz(questions, answers)
+    validate_quiz_images(images)
+    validate_quiz_text(questions, answers)
 
     redirect('/')
 end

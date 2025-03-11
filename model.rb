@@ -58,7 +58,7 @@ def check_activity()
     end
 end
 
-def validate_quiz(questions, answers)
+def validate_quiz_text(questions, answers)
 
     
     if !questions || !answers || questions.empty? || answers.empty?
@@ -74,6 +74,32 @@ def validate_quiz(questions, answers)
                 flash[:quiz_error] = "Answer #{i+1} cannot be blank..."
                 redirect('/quiz/create')
             end
+        end
+    end
+end
+
+def validate_quiz_images(images) 
+    if images
+        images.each do |image|
+            next unless image && image[:tempfile] #Vill även lägga till felhantering för för stora bilder.
+            
+            filename = SecureRandom.alphanumeric(24)
+            file_extension = File.extname(image[:filename]).downcase
+            filename << file_extension
+            allowed_extensoins = [".png", ".jpg", ".jpeg"]
+
+            unless allowed_extensoins.include?(file_extension)
+                flash[:quiz_error] = "Invalid image format"
+                redirect('/quiz/create')
+            end
+            path = "./public/uploads/#{filename}"
+            
+            file = image[:tempfile]
+
+            File.open(path, 'wb') do |f|
+                f.write(file.read)
+            end
+
         end
     end
 end
