@@ -46,18 +46,28 @@ post('/logging') do
 end
 
 get('/quiz/create') do
+    if !session[:userId]
+        flash[:login_error] = "You have to be logged in to create a quiz..."
+        redirect('/login')
+    end
     slim(:quizcreator)
 end
 
 post('/quiz/creating') do
+
     db = SQLite3::Database.new('./db/database.db')
     questions = params[:questions_text]
     answers = params[:answers]
     images = params[:questions_image]
+    visibility = params[:visibility]
+    title = params[:title]
+    
 
-
-    validate_quiz_images(images)
+    validate_quiz_meta(title)
+    validate_quiz_and_upload_images(images)
     validate_quiz_text(questions, answers)
+
+    
 
     redirect('/')
 end

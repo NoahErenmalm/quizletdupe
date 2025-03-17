@@ -59,8 +59,6 @@ def check_activity()
 end
 
 def validate_quiz_text(questions, answers)
-
-    
     if !questions || !answers || questions.empty? || answers.empty?
         errors << "Quiz must contain one or more questions..."
 
@@ -78,7 +76,7 @@ def validate_quiz_text(questions, answers)
     end
 end
 
-def validate_quiz_images(images) 
+def validate_quiz_and_upload_images(images) 
     if images
         images.each do |image|
             next unless image && image[:tempfile] #Vill även lägga till felhantering för för stora bilder.
@@ -92,14 +90,19 @@ def validate_quiz_images(images)
                 flash[:quiz_error] = "Invalid image format"
                 redirect('/quiz/create')
             end
-            path = "./public/uploads/#{filename}"
-            
-            file = image[:tempfile]
 
+            path = "./public/uploads/#{filename}"
+            file = image[:tempfile]
             File.open(path, 'wb') do |f|
                 f.write(file.read)
             end
-
         end
+    end
+end
+
+def validate_quiz_meta(title)
+    if title == ""
+        flash[:quiz_error] = "Quiz needs a title..."
+        redirect('/quiz/create')
     end
 end
