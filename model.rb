@@ -76,14 +76,12 @@ def validate_quiz_text(questions, answers)
     end
 end
 
-def validate_quiz_and_upload_images(images) 
+def validate_quiz_images(images) 
     if images
         images.each do |image|
             next unless image && image[:tempfile] #Vill även lägga till felhantering för för stora bilder.
             
-            filename = SecureRandom.alphanumeric(24)
             file_extension = File.extname(image[:filename]).downcase
-            filename << file_extension
             allowed_extensoins = [".png", ".jpg", ".jpeg"]
 
             unless allowed_extensoins.include?(file_extension)
@@ -91,11 +89,7 @@ def validate_quiz_and_upload_images(images)
                 redirect('/quiz/create')
             end
 
-            path = "./public/uploads/#{filename}"
-            file = image[:tempfile]
-            File.open(path, 'wb') do |f|
-                f.write(file.read)
-            end
+            
         end
     end
 end
@@ -104,5 +98,46 @@ def validate_quiz_meta(title)
     if title == ""
         flash[:quiz_error] = "Quiz needs a title..."
         redirect('/quiz/create')
+    end
+end
+
+def upload_quiz(questions, answers, images, title, visibility, db)
+    #visibility handling
+    if visibility
+        visibility = 1
+    else
+        visibility = 0
+    end
+    #length of quiz
+    size = questions.length
+    #metadata
+    db.transaction do
+        db.execute("INSERT INTO quiz (UserId, Title, Size, Private) VALUES (?, ?, ?, ?)", [session[:userId], title, size, visibility])
+        last_id = db.last_insert_row_id
+
+        questions.each_with_index do |question, index|
+            answer = answers[index]
+            image_path = images && images[index] && !images[index].empty? ? upload_image(images, index) : nil
+
+            quiz_meta = db.execute("INSERT INTO questions (QuizId, question, answer, image) VALUES(?, ?, ?, ?)",[last_id, question, answer, image_path])
+        end
+    end
+end
+
+def upload_image(images, index)
+    p images[index]
+    p images
+    if images[index] != nil
+        file_extension = File.extname(images[index][:filename]).downcase
+        filename = SecureRandom.alphanumeric(24)
+        filename << file_extension
+        path = "./public/quizImages/#{filename}"
+        file = images[index][:tempfile]
+        File.open(path, 'wb') do |f|
+            f.write(file.read)
+        end
+        return path
+    else
+        return nil
     end
 end

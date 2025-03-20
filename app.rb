@@ -50,7 +50,7 @@ get('/quiz/create') do
         flash[:login_error] = "You have to be logged in to create a quiz..."
         redirect('/login')
     end
-    slim(:quizcreator)
+    slim(:"quiz/quizcreator")
 end
 
 post('/quiz/creating') do
@@ -64,10 +64,20 @@ post('/quiz/creating') do
     
 
     validate_quiz_meta(title)
-    validate_quiz_and_upload_images(images)
     validate_quiz_text(questions, answers)
+    validate_quiz_images(images)
 
-    
+
+    #upload_image(images, 0)
+    upload_quiz(questions, answers, images, title, visibility, db)
+
 
     redirect('/')
+end
+
+get('quiz/:id') do
+
+
+    slim(:quiz/quizhome)
+
 end
