@@ -1,7 +1,7 @@
 - if flash[:quiz_error]
     p.error-text =flash[:quiz_error]
 
-form action="creating" method="post" enctype="multipart/form-data"    
+form#create-quiz-form action="creating" method="post" enctype="multipart/form-data"    
     <input type="text" name="title" placeholder="Enter Title Name..." required>
     input type="submit" value="Upload" /
     label for="visibility" Private?:
@@ -9,7 +9,8 @@ form action="creating" method="post" enctype="multipart/form-data"
 
     div#questions-container
         div class="quiz-create-question-box"
-            input type="file" name="questions_image[]"/   
+            input type="hidden" name="questions_image[]"/
+            input type="file" name="questions_image[]" accept="image/png, image/jpg, image/jpeg"/   
             <input type="text"name="questions_text[]" placeholder="Enter question..." required>
             <input type="text" name="answers[]" placeholder="Enter answer..." required>
 

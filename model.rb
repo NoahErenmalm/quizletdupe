@@ -76,23 +76,43 @@ def validate_quiz_text(questions, answers)
     end
 end
 
-def validate_quiz_images(images) 
-    if images
-        images.each do |image|
-            next unless image && image[:tempfile] #Vill även lägga till felhantering för för stora bilder.
-            
-            file_extension = File.extname(image[:filename]).downcase
-            allowed_extensoins = [".png", ".jpg", ".jpeg"]
-
-            unless allowed_extensoins.include?(file_extension)
-                flash[:quiz_error] = "Invalid image format"
-                redirect('/quiz/create')
+def format_image_array(images)
+    array = []
+    n = 0
+    if !images.empty?
+        while n < images.length
+            if images[n+1] == ""
+                array << nil
+                n += 1
+            elsif images[n+1] == nil
+                array << nil
+                n += 1
+            else
+                array << images[n+1]
+                n += 2
             end
+        end
+    end
+    return array
+end
 
-            
+def validate_quiz_images(images)
+    if images
+        images.each do |index, image|
+        # Skip if no file data is present
+            next unless image && image[:tempfile]
+        
+            file_extension = File.extname(image[:filename]).downcase
+            allowed_extensions = [".png", ".jpg", ".jpeg"]
+  
+            unless allowed_extensions.include?(file_extension)
+            flash[:quiz_error] = "Invalid image format for image at index #{index}"
+            redirect('/quiz/create')
+            end
         end
     end
 end
+  
 
 def validate_quiz_meta(title)
     if title == ""
@@ -103,21 +123,18 @@ end
 
 def upload_quiz(questions, answers, images, title, visibility, db)
     #visibility handling
-    if visibility
-        visibility = 1
-    else
-        visibility = 0
-    end
+    visibility = visibility ? 1 : 0
     #length of quiz
     size = questions.length
     #metadata
+
     db.transaction do
         db.execute("INSERT INTO quiz (UserId, Title, Size, Private) VALUES (?, ?, ?, ?)", [session[:userId], title, size, visibility])
         last_id = db.last_insert_row_id
 
         questions.each_with_index do |question, index|
             answer = answers[index]
-            image_path = images && images[index] && !images[index].empty? ? upload_image(images, index) : nil
+            image_path = upload_image(images, index)
 
             quiz_meta = db.execute("INSERT INTO questions (QuizId, question, answer, image) VALUES(?, ?, ?, ?)",[last_id, question, answer, image_path])
         end
@@ -125,8 +142,6 @@ def upload_quiz(questions, answers, images, title, visibility, db)
 end
 
 def upload_image(images, index)
-    p images[index]
-    p images
     if images[index] != nil
         file_extension = File.extname(images[index][:filename]).downcase
         filename = SecureRandom.alphanumeric(24)
@@ -136,7 +151,7 @@ def upload_image(images, index)
         File.open(path, 'wb') do |f|
             f.write(file.read)
         end
-        return path
+        return "/quizImages/#{filename}"
     else
         return nil
     end

@@ -61,23 +61,28 @@ post('/quiz/creating') do
     images = params[:questions_image]
     visibility = params[:visibility]
     title = params[:title]
-    
+
+    images = format_image_array(images)
 
     validate_quiz_meta(title)
     validate_quiz_text(questions, answers)
     validate_quiz_images(images)
 
-
-    #upload_image(images, 0)
     upload_quiz(questions, answers, images, title, visibility, db)
 
 
     redirect('/')
 end
 
-get('quiz/:id') do
+get('/quiz/:id') do
+    quiz_id = params[:id]
+    db = SQLite3::Database.new('./db/database.db')
+    db.results_as_hash = true
 
+    @quiz = db.execute("SELECT * FROM quiz WHERE quizId = ?", quiz_id).first
+    @questions = db.execute("SELECT * FROM questions WHERE QuizId = ?", quiz_id)
 
-    slim(:quiz/quizhome)
-
+    
+    p @questions
+    slim(:"quiz/quizhome")
 end
