@@ -93,3 +93,31 @@ get('/quiz/:id/test/typing') do
     @data = db.execute("SELECT question, answer, image FROM questions WHERE QuizId = ?", @quiz_id).shuffle
     slim(:"/quiz/tests/typing")
 end
+
+get('/profile/:id') do
+    user_id = params[:id]
+
+    db = SQLite3::Database.new('./db/database.db')
+    db.results_as_hash = true
+
+    @username = db.execute("SELECT Username FROM users WHERE userId = ?", user_id).first
+    @quizs = db.execute("SELECT * FROM quiz WHERE userId = ?", user_id)
+
+    slim(:"profile/profile")
+end
+
+get('/error') do
+    slim(:error)
+end
+
+get('/profile/:id/favorites') do
+    user_id = params[:id]
+    if session[:userId] != user_id
+        redirect('/error')
+    end
+
+    db = SQLite3::Database.new('./db/database.db')
+    db.results_as_hash = true
+
+    slim(:"profile/favorites")
+end
