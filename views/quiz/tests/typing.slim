@@ -1,0 +1,19 @@
+a href="/quiz/#{@quiz_id}" back to quiz
+div#quiz-container
+  - @data.each_with_index do |question, index|
+    div class="question-div" id="question-#{index}" style="display: none;"
+        - if question["image"] != nil
+            img src="#{question["image"]}" alt="Quiz Image"
+        h2 = question["question"]
+
+        form onsubmit="return checkAnswer(#{index});"
+          input type="hidden" id="correct-answer-#{index}" value="#{question["answer"]}"
+          input type="text" id="user-input-#{index}" placeholder="Your answer"
+          button type="submit" Submit
+div#result-container style="display: none;"
+  h2#score
+  button#replay-button Replay Quiz
+  ul#incorrect-list
+
+
+script src="/js/typing.js"

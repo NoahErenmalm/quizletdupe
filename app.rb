@@ -82,7 +82,14 @@ get('/quiz/:id') do
     @quiz = db.execute("SELECT * FROM quiz WHERE quizId = ?", quiz_id).first
     @questions = db.execute("SELECT * FROM questions WHERE QuizId = ?", quiz_id)
 
-    
-    p @questions
     slim(:"quiz/quizhome")
+end
+
+get('/quiz/:id/test/typing') do
+    @quiz_id = params[:id]
+    db = SQLite3::Database.new('./db/database.db')
+    db.results_as_hash = true
+
+    @data = db.execute("SELECT question, answer, image FROM questions WHERE QuizId = ?", @quiz_id).shuffle
+    slim(:"/quiz/tests/typing")
 end

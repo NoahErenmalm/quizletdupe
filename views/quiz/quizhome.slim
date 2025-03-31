@@ -2,10 +2,11 @@ h1 = @quiz["Title"]
 
 h3 Number of questions: #{@quiz["Size"]}
 
+a href="/quiz/#{@quiz["QuizId"]}/test/typing" typing
+
 - @questions.each do |question|
     div
         - if question["image"]
-            -p question["image"]
             img src="#{question["image"]}" alt="IMG"
         p = question["question"]
         p = question["answer"]

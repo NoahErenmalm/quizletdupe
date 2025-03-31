@@ -81,10 +81,7 @@ def format_image_array(images)
     n = 0
     if !images.empty?
         while n < images.length
-            if images[n+1] == ""
-                array << nil
-                n += 1
-            elsif images[n+1] == nil
+            if images[n+1] == "" || images[n+1] == nil
                 array << nil
                 n += 1
             else

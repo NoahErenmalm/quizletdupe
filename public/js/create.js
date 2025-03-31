@@ -1,5 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
   var addButton = document.getElementById('add-question-button');
+
+  var removeButton = document.getElementById('remove-question-button');
+
+  removeButton.addEventListener('click', function()) {
+        
+
+  }
   
   addButton.addEventListener('click', function() {
     
