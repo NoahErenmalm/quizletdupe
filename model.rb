@@ -95,16 +95,28 @@ end
 
 def validate_quiz_images(images)
     if images
-        images.each do |index, image|
-        # Skip if no file data is present
-            next unless image && image[:tempfile]
-        
-            file_extension = File.extname(image[:filename]).downcase
+        images.each_with_index do |image, index|
             allowed_extensions = [".png", ".jpg", ".jpeg"]
-  
-            unless allowed_extensions.include?(file_extension)
-            flash[:quiz_error] = "Invalid image format for image at index #{index}"
-            redirect('/quiz/create')
+            next if image.nil?
+
+            if image.is_a?(String)
+                file_extension = File.extname(image).downcase
+                
+                unless allowed_extensions.include?(file_extension)
+                    flash[:quiz_error] = "Invalid image at index #{index}"
+                    redirect('/quiz/create')
+                end
+            elsif image.is_a?(Hash) && image[:tempfile]
+                file_extension = File.extname(image[:filename]).downcase
+
+                unless allowed_extensions.include?(file_extension)
+                    flash[:quiz_error] = "Invalid image image at index #{index}"
+                    redirect('/quiz/create')
+                end
+            else
+
+                flash[:quiz_error] = "Invalid image at index #{index}"
+                redirect('/quiz/create')
             end
         end
     end
@@ -149,7 +161,28 @@ def upload_image(images, index)
             f.write(file.read)
         end
         return "/quizImages/#{filename}"
+    elsif images[index].is_a?(String)
+        return images[index]
     else
         return nil
+    end
+end
+
+def update_quiz(questions, answers, images, title, visibility, quiz_id, db)
+    visibility = visibility ? 1 : 0
+    size = questions.length
+    
+    db.transaction do
+        db.execute("UPDATE quiz SET Title = ?, Private = ? WHERE QuizId = ?", [title, visibility, quiz_id])
+
+        db.execute("DELETE FROM questions WHERE QuizId = ?", quiz_id)
+
+        questions.each_with_index do |question, index|
+            answer = answers[index]
+            image_path = upload_image(images, index)
+
+            db.execute("INSERT INTO questions (QuizId, Question, Answer, Image) VALUES (?, ?, ?, ?)", [quiz_id, question, answer, image_path])
+        end
+
     end
 end

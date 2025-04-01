@@ -1,0 +1,25 @@
+form#create-quiz-form action="editing" method="post" enctype="multipart/form-data"    
+    <input type="text" name="title" placeholder="Enter Title Name..." value="#{@quiz_meta["Title"]}" required>
+    label for="visibility" Private?:
+    input type="checkbox" name="visibility"/
+    input type="submit" value="Upload" /
+    
+
+    - @quiz_questions.each do |question|
+        div#questions-container
+            div class="quiz-create-question-box"
+                input type="hidden" name="questions_image[]"/
+                - if question["image"] == nil
+                    input type="file" name="questions_image[]" accept="image/png, image/jpg, image/jpeg" /   
+                - else
+                    img src="#{question["image"]}" alt=""
+                    button type="button" class="remove-image-button" data-action="remove-image" Remove Image
+                    input type="hidden" name="questions_image[]" value="#{question["image"]}" /
+                <input type="text"name="questions_text[]" placeholder="Enter question..." value="#{question["question"]}" required>
+                <input type="text" name="answers[]" placeholder="Enter answer..." value="#{question["answer"]}" required>
+                button type="button" class="remove-question-button" --
+
+
+button type="button" id="add-question-button" +
+
+script src="/js/edit.js"

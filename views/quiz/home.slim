@@ -1,8 +1,12 @@
 h1 = @quiz["Title"]
 
 h3 Number of questions: #{@quiz["Size"]}
+- if session[:userId] == @quiz["UserId"] || @quiz["Private"] == 0
+    a href="/quiz/#{@quiz["QuizId"]}/edit" edit
 
 a href="/quiz/#{@quiz["QuizId"]}/test/typing" typing
+
+
 
 - @questions.each do |question|
     div

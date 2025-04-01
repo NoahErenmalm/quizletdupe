@@ -50,10 +50,15 @@ get('/quiz/create') do
         flash[:login_error] = "You have to be logged in to create a quiz..."
         redirect('/login')
     end
-    slim(:"quiz/quizcreator")
+    slim(:"quiz/creator")
 end
 
 post('/quiz/creating') do
+
+    if !session[:userId]
+        flash[:login_error] = "You have to be logged in to create a quiz..."
+        redirect('/login')
+    end
 
     db = SQLite3::Database.new('./db/database.db')
     questions = params[:questions_text]
@@ -70,7 +75,6 @@ post('/quiz/creating') do
 
     upload_quiz(questions, answers, images, title, visibility, db)
 
-
     redirect('/')
 end
 
@@ -79,10 +83,52 @@ get('/quiz/:id') do
     db = SQLite3::Database.new('./db/database.db')
     db.results_as_hash = true
 
+    quiz_owner = db.execute("SELECT UserId FROM quiz WHERE quizId = ?", quiz_id).first
+    if quiz_owner["UserId"] != session[:userId]
+        redirect('/error')
+    end
+
     @quiz = db.execute("SELECT * FROM quiz WHERE quizId = ?", quiz_id).first
     @questions = db.execute("SELECT * FROM questions WHERE QuizId = ?", quiz_id)
 
-    slim(:"quiz/quizhome")
+    slim(:"quiz/home")
+end
+
+get('/quiz/:id/edit') do
+    quiz_id = params[:id]
+    db = SQLite3::Database.new('./db/database.db')
+    db.results_as_hash = true
+
+    @quiz_meta = db.execute("SELECT * FROM quiz WHERE quizId = ?", quiz_id).first
+
+    @quiz_questions = db.execute("SELECT * FROM questions WHERE QuizId = ?", quiz_id)
+
+    if session[:userId] != @quiz_meta["UserId"]
+        redirect('/error')
+    end
+    slim(:"quiz/edit")
+end
+
+post('/quiz/:id/editing') do
+    quiz_id = params[:id]
+    db = SQLite3::Database.new('./db/database.db')
+    db.results_as_hash = true
+
+    questions = params[:questions_text]
+    answers = params[:answers]
+    images = params[:questions_image]
+    visibility = params[:visibility]
+    title = params[:title]
+
+    images = format_image_array(images)
+
+    validate_quiz_meta(title)
+    validate_quiz_text(questions, answers)
+    validate_quiz_images(images)
+
+    update_quiz(questions, answers, images, title, visibility, quiz_id, db)
+    
+    redirect("/quiz/#{quiz_id}")
 end
 
 get('/quiz/:id/test/typing') do
@@ -118,6 +164,8 @@ get('/profile/:id/favorites') do
 
     db = SQLite3::Database.new('./db/database.db')
     db.results_as_hash = true
+
+    #inte klar
 
     slim(:"profile/favorites")
 end
