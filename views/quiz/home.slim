@@ -1,8 +1,16 @@
 h1 = @quiz["Title"]
 
 h3 Number of questions: #{@quiz["Size"]}
-- if session[:userId] == @quiz["UserId"] || @quiz["Private"] == 0
+- if session[:userId] == @quiz["UserId"]
+    form action="/quiz/#{@quiz["QuizId"]}/delete" method="post" onsubmit="return confirm('You are about to delete #{@quiz["Title"]}, are you sure?');"
+        button type="submit" delete
     a href="/quiz/#{@quiz["QuizId"]}/edit" edit
+    - if @favorite.empty?
+        form action="/quiz/#{@quiz["QuizId"]}/favouriting" method="post"
+            button type="submit" favorite
+    - else
+        form action="/quiz/#{@quiz["QuizId"]}/unfavouriting" method="post"
+            button type="submit" unfavorite
 
 a href="/quiz/#{@quiz["QuizId"]}/test/typing" typing
 

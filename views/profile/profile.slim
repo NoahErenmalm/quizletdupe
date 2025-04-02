@@ -1,6 +1,6 @@
 h1 = @username["Username"]
 
-- if session[:userId] == @quizs[0]["UserId"]
+- if session[:userId].to_i == @user_id.to_i
     a href="/profile/#{session[:userId]}/favorites" favorites
 
 - @quizs.each do |quiz|
@@ -8,5 +8,3 @@ h1 = @username["Username"]
         div.quiz-card
             a href="/quiz/#{quiz["QuizId"]}"  #{quiz["Title"]}
             p = "number of questions: #{quiz["Size"]}"
-            
-    

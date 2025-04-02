@@ -143,15 +143,17 @@ def upload_quiz(questions, answers, images, title, visibility, db)
 
         questions.each_with_index do |question, index|
             answer = answers[index]
-            image_path = upload_image(images, index)
+            image_path = upload_image(images, index, db)
 
             quiz_meta = db.execute("INSERT INTO questions (QuizId, question, answer, image) VALUES(?, ?, ?, ?)",[last_id, question, answer, image_path])
         end
     end
 end
 
-def upload_image(images, index)
-    if images[index] != nil
+def upload_image(images, index, db)
+    if images[index].is_a?(String)
+        return images[index]
+    elsif images[index] != nil 
         file_extension = File.extname(images[index][:filename]).downcase
         filename = SecureRandom.alphanumeric(24)
         filename << file_extension
@@ -160,9 +162,7 @@ def upload_image(images, index)
         File.open(path, 'wb') do |f|
             f.write(file.read)
         end
-        return "/quizImages/#{filename}"
-    elsif images[index].is_a?(String)
-        return images[index]
+        return "/quizImages/#{filename}" 
     else
         return nil
     end
@@ -179,10 +179,31 @@ def update_quiz(questions, answers, images, title, visibility, quiz_id, db)
 
         questions.each_with_index do |question, index|
             answer = answers[index]
-            image_path = upload_image(images, index)
+            image_path = upload_image(images, index, db)
 
             db.execute("INSERT INTO questions (QuizId, Question, Answer, Image) VALUES (?, ?, ?, ?)", [quiz_id, question, answer, image_path])
         end
-
     end
+    cleanup_images()
+end
+
+def cleanup_images()
+    db = SQLite3::Database.new('./db/database.db')
+
+    images_db = db.execute("SELECT image FROM questions").flatten
+
+    images_path = Dir.glob("./public/quizImages/*")
+    images_path = images_path.map { |path| path.sub('./public', '') }
+
+    unused_images = images_path.reject { |path| images_db.include?(path) }
+
+    unused_images.each do |unused_image|
+        full_path = "./public#{unused_image}" # Re-add './public' to get the full path
+        File.delete(full_path) if File.exist?(full_path)
+    end
+end
+
+def delete_quiz(quiz_id, db)
+    db.execute("DELETE FROM quiz WHERE quizId = ?", quiz_id)
+    db.execute("DELETE FROM questions WHERE quizId = ?", quiz_id)
 end

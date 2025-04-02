@@ -12,7 +12,6 @@ html lang="en"
             nav 
                 a class="header-button" href="/" Home 
                 a class="header-button" href="/quiz/create" Skapa ny Quiz
-                a class="header-button" href="" Dina Quiz
             - if session[:username] != nil
                 a href="/profile/#{session[:userId]}" #{session[:username]}
         hr/
