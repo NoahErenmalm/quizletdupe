@@ -1,4 +1,6 @@
 h1 = @quiz["Title"]
+- if @quiz["Private"] == 1
+    p This quiz is private
 
 h3 Number of questions: #{@quiz["Size"]}
 - if session[:userId] == @quiz["UserId"]

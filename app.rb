@@ -93,7 +93,7 @@ get('/quiz/:id') do
     @quiz = db.execute("SELECT * FROM quiz WHERE quizId = ?", quiz_id).first
     @questions = db.execute("SELECT * FROM questions WHERE QuizId = ?", quiz_id)
     @favorite = db.execute("SELECT UserId, QuizId FROM saves WHERE UserId = ? AND QuizId = ?", [quiz_owner["UserId"], @quiz["QuizId"]])
-    p @favorite
+
     slim(:"quiz/home")
 end
 
@@ -114,6 +114,11 @@ end
 
 post('/quiz/:id/editing') do
     quiz_id = params[:id]
+    if session[:userId].nil?
+        redirect("/error")
+    else
+        user_id = session[:userId]
+    end
     db = SQLite3::Database.new('./db/database.db')
     db.results_as_hash = true
 
@@ -131,6 +136,8 @@ post('/quiz/:id/editing') do
 
     update_quiz(questions, answers, images, title, visibility, quiz_id, db)
 
+    edit_quiz_update_favorite(user_id, quiz_id, db, visibility)
+
     redirect("/quiz/#{quiz_id}")
 end
 
@@ -145,6 +152,7 @@ post('/quiz/:id/delete') do
     end
 
     delete_quiz(quiz_id, db)
+    unfavorite_quiz(nil, quiz_id, db)
 
     redirect("./profile/#{quiz_owner["UserId"]}")
 end
@@ -183,7 +191,7 @@ get('/profile/:id/favorites') do
     db = SQLite3::Database.new('./db/database.db')
     db.results_as_hash = true
 
-    #inte klar
+    load_favorite_quiz(user_id, db)
 
     slim(:"profile/favorites")
 end
@@ -197,7 +205,9 @@ post('/quiz/:id/favouriting') do
         user_id = session[:userId]
     end
     db = SQLite3::Database.new('./db/database.db')
-    db.execute("INSERT INTO saves (UserId, QuizId) VALUES (?, ?)", [user_id, quiz_id])
+    db.results_as_hash = true
+    
+    favorite_quiz(user_id, quiz_id, db)
 
     redirect("/quiz/#{quiz_id}")
 end
@@ -211,7 +221,9 @@ post('/quiz/:id/unfavouriting') do
         user_id = session[:userId]
     end
     db = SQLite3::Database.new('./db/database.db')
-    db.execute("DELETE FROM saves WHERE UserId = ? AND QuizId = ?", [user_id, quiz_id])
+    
+    unfavorite_quiz(user_id, quiz_id, db)
+
     redirect("/quiz/#{quiz_id}")
 end
 

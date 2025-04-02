@@ -207,3 +207,39 @@ def delete_quiz(quiz_id, db)
     db.execute("DELETE FROM quiz WHERE quizId = ?", quiz_id)
     db.execute("DELETE FROM questions WHERE quizId = ?", quiz_id)
 end
+
+def load_favorite_quiz(user_id, db)
+    favorites = db.execute("SELECT QuizId FROM saves WHERE UserId = ?", user_id)
+    quiz_ids = favorites.map { |favorite| favorite["QuizId"] }
+
+    if quiz_ids.any?
+        placeholders = quiz_ids.map { '?' }.join(', ')
+        @quizs = db.execute("SELECT * FROM quiz WHERE quizId IN (#{placeholders})", quiz_ids)
+    end
+end
+
+def favorite_quiz(user_id, quiz_id, db)
+    if db.execute("SELECT UserId, QuizId FROM saves WHERE UserId = ? AND QuizId = ?", [user_id, quiz_id]).empty?
+        db.execute("INSERT INTO saves (UserId, QuizId) VALUES (?, ?)", [user_id, quiz_id])
+    else
+        flash[:favourite_error] = "You already saved this quiz"
+        redirect("/quiz/#{quiz_id}")
+    end
+end
+
+def unfavorite_quiz(user_id, quiz_id, db)
+    if user_id.nil?
+        db.execute("DELETE FROM saves WHERE QuizId = ?", quiz_id)
+    else
+        db.execute("DELETE FROM saves WHERE UserId = ? AND QuizId = ?", [user_id, quiz_id])
+    end
+end
+
+def edit_quiz_update_favorite(user_id, quiz_id, db, visibility)
+    if visibility && !db.execute("SELECT UserId, QuizId FROM saves WHERE UserId = ? AND QuizId = ?", [user_id, quiz_id]).empty?
+        unfavorite_quiz(nil, quiz_id, db)
+        favorite_quiz(user_id, quiz_id, db)
+    elsif visibility
+        unfavorite_quiz(nil, quiz_id, db)
+    end
+end
