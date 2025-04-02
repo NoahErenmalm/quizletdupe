@@ -12,10 +12,12 @@ nav {
   min-width: 300px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .header-button {
   padding: 1% 5%;
+  line-height: 1;
   color: rgb(0, 0, 0);
   background: #ffffff;
   position: relative;
@@ -25,6 +27,7 @@ nav {
   -webkit-user-select: none;
   touch-action: manipulation;
   text-decoration: none;
+  display: inline-block;
 }
 
 .header-button:before {
@@ -170,4 +173,44 @@ hr {
 
 .quiz-create-question-box {
   color: red;
+}
+
+.profile-icon img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-icon-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%; /* Position below the profile icon */
+  right: 0; /* Align to the right of the container */
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  min-width: 150px;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: black;
+  white-space: nowrap;
+}
+
+.dropdown-menu a:hover {
+  background-color: #f0f0f0;
+}
+
+.profile-icon-container:hover .dropdown-menu {
+  display: block;
 }

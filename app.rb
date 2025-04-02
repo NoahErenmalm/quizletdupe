@@ -14,6 +14,13 @@ before do
 end
 
 get('/') do
+    db = SQLite3::Database.new('./db/database.db')
+    db.results_as_hash = true
+
+    quizs = db.execute("SELECT * FROM quiz").shuffle
+
+    @selected_quizs = quizs.take(20)
+
     slim(:index)
 end
 
@@ -42,6 +49,12 @@ post('/logging') do
     db = SQLite3::Database.new('./db/database.db')
 
     login_request(username, password, db)
+    redirect('/')
+end
+
+get('/logout') do
+    
+    session.clear
     redirect('/')
 end
 

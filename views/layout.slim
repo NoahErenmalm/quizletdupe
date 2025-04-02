@@ -12,7 +12,19 @@ html lang="en"
             nav 
                 a class="header-button" href="/" Home 
                 a class="header-button" href="/quiz/create" Skapa ny Quiz
-            - if session[:username] != nil
-                a href="/profile/#{session[:userId]}" #{session[:username]}
+                - if session[:userId]
+                    div class="profile-icon-container"
+                        a class="profile-icon" href="/profile/#{session[:userId]}"
+                            img src="/img/profileicon.png" alt="Profile"/
+                        div class="dropdown-menu"
+                            a href="/profile/#{session[:userId]}" Profile
+                            a href="/profile/#{session[:userId]}/favorites" Favorites
+                            a href="/logout" Logout
+                - else 
+                    div class="profile-icon-container"
+                        a class="profile-icon" href="/login"
+                            img src="/img/profileicon.png" alt="Profile"/
+                        div class="dropdown-menu"
+                            a href="/login" Login
         hr/
         ==yield 
