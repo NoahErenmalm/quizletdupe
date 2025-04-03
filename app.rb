@@ -239,4 +239,3 @@ post('/quiz/:id/unfavouriting') do
 
     redirect("/quiz/#{quiz_id}")
 end
-

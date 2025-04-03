@@ -153,10 +153,19 @@ end
 def upload_image(images, index, db)
     if images[index].is_a?(String)
         return images[index]
-    elsif images[index] != nil 
+    elsif images[index] != nil
+
+        existing_images = db.execute("SELECT image FROM questions").flatten.map do |path|
+            File.basename(path) # Extract only the filename
+        end
         file_extension = File.extname(images[index][:filename]).downcase
-        filename = SecureRandom.alphanumeric(24)
-        filename << file_extension
+        filename = nil
+
+        loop do
+            filename = SecureRandom.alphanumeric(24) + file_extension
+            break unless existing_images.include?(filename)
+        end
+
         path = "./public/quizImages/#{filename}"
         file = images[index][:tempfile]
         File.open(path, 'wb') do |f|
