@@ -7,12 +7,16 @@ require 'bcrypt'
 require_relative './model.rb'
 require 'securerandom'
 
+include Model
+
 enable :sessions
 
+#Check activity
 before do
     check_activity()
 end
 
+#Display home page
 get('/') do
     db = SQLite3::Database.new('./db/database.db')
     db.results_as_hash = true
@@ -24,25 +28,38 @@ get('/') do
     slim(:index)
 end
 
+#Display registering page
 get('/register') do
     slim(:register)
 end
 
+#Creates a new user account and redirect to home page
+#
+# username: The username of the user
+# password: The password of the user
+# password_confirm: The password confirmation of the user
+# db: The database connection
 post('/registering') do
     username = params[:username]
     password = params[:password]
     password_confirm = params[:password_confirm]
     db = SQLite3::Database.new('./db/database.db')
 
-    validate_register_account(username, password, db)
+    validate_register_account(username, password, password_confirm, db)
     login_request(username, password, db)
     redirect('/')
 end
 
+#Display login page
 get('/login') do
     slim(:login)
 end
 
+#Attempt to log in the user and redirect to home page
+#
+# username: The username of the user
+# password: The password of the user
+# db: The database connection
 post('/logging') do
     username = params[:username]
     password = params[:password]
@@ -52,12 +69,17 @@ post('/logging') do
     redirect('/')
 end
 
+#Display a logout page and clear the session and redirect to home page
+#
+# session: The session of the user
 get('/logout') do
     
     session.clear
     redirect('/')
 end
 
+#Display the quiz creation page
+#Check if the user is logged in, if not redirect to login page
 get('/quiz/create') do
     if !session[:userId]
         flash[:login_error] = "You have to be logged in to create a quiz..."
@@ -66,6 +88,16 @@ get('/quiz/create') do
     slim(:"quiz/creator")
 end
 
+#Create a new quiz and redurect to the quiz page
+#
+# session: The session of the user
+# db: The database connection
+# questions: The questions of the quiz
+# answers: The answers of the quiz
+# images: The images of the quiz
+# visibility: The visibility of the quiz
+# title: The title of the quiz
+# quiz_id: The id of the quiz
 post('/quiz/creating') do
 
     if !session[:userId]
@@ -93,6 +125,15 @@ post('/quiz/creating') do
 
 end
 
+#Display the quiz page
+#
+# quiz_id: The id of the quiz
+# db: The database connection
+# quiz_owner: The owner of the quiz
+# @quiz: The quiz data
+# @questions: The questions of the quiz
+# @favorite: The favorite status of the quiz
+# session: The session of the user
 get('/quiz/:id') do
     quiz_id = params[:id]
     db = SQLite3::Database.new('./db/database.db')
@@ -110,6 +151,14 @@ get('/quiz/:id') do
     slim(:"quiz/home")
 end
 
+#Display the quiz editing page
+#Check if the user is logged in, if not redirect to login page
+#
+# quiz_id: The id of the quiz
+# db: The database connection
+# @quiz_meta: The quiz metadata
+# @quiz_questions: The quiz questions
+# session: The session of the user
 get('/quiz/:id/edit') do
     quiz_id = params[:id]
     db = SQLite3::Database.new('./db/database.db')
@@ -125,6 +174,16 @@ get('/quiz/:id/edit') do
     slim(:"quiz/edit")
 end
 
+#Update the quiz and redirect to the quiz page
+#
+# quiz_id: The id of the quiz
+# db: The database connection
+# questions: The questions of the quiz
+# answers: The answers of the quiz
+# images: The images of the quiz
+# visibility: The visibility of the quiz
+# title: The title of the quiz
+# session: The session of the user
 post('/quiz/:id/editing') do
     quiz_id = params[:id]
     if session[:userId].nil?
@@ -154,6 +213,12 @@ post('/quiz/:id/editing') do
     redirect("/quiz/#{quiz_id}")
 end
 
+#Delete the quiz and redirect to the profile page
+#
+# quiz_id: The id of the quiz
+# db: The database connection
+# quiz_owner: The owner of the quiz
+# session: The session of the user
 post('/quiz/:id/delete') do
     quiz_id = params[:id]
     db = SQLite3::Database.new('./db/database.db')
@@ -170,6 +235,11 @@ post('/quiz/:id/delete') do
     redirect("./profile/#{quiz_owner["UserId"]}")
 end
 
+#Display quiz test page(typing test)
+#
+# @quiz_id: The id of the quiz
+# db: The database connection
+# @data: The quiz data
 get('/quiz/:id/test/typing') do
     @quiz_id = params[:id]
     db = SQLite3::Database.new('./db/database.db')
@@ -179,6 +249,12 @@ get('/quiz/:id/test/typing') do
     slim(:"/quiz/tests/typing")
 end
 
+#Dipsplay profile page
+#
+# @user_id: The id of the user
+# db: The database connection
+# @username: The username of the user
+# @quizs: The quizs of the user
 get('/profile/:id') do
     @user_id = params[:id]
 
@@ -191,10 +267,17 @@ get('/profile/:id') do
     slim(:"profile/profile")
 end
 
+#Display the error page
 get('/error') do
     slim(:error)
 end
 
+#Diplsay the the favoruites of a user
+#Check if the user is logged in, if not redirect to login page
+#
+# user_id: The id of the user
+# db: The database connection
+# session: The session of the user
 get('/profile/:id/favorites') do
     user_id = params[:id].to_i
     if session[:userId].to_i != user_id
@@ -209,6 +292,12 @@ get('/profile/:id/favorites') do
     slim(:"profile/favorites")
 end
 
+#Favorite a quiz and redirect to the said quiz's page
+#
+# quiz_id: The id of the quiz
+# user_id: The id of the user
+# db: The database connection
+# session: The session of the user
 post('/quiz/:id/favouriting') do
     quiz_id = params[:id]
     if !session[:userId]
@@ -225,6 +314,12 @@ post('/quiz/:id/favouriting') do
     redirect("/quiz/#{quiz_id}")
 end
 
+#Unfavorite a quiz and redirect to the said quiz's page
+#
+# quiz_id: The id of the quiz
+# user_id: The id of the user
+# db: The database connection
+# session: The session of the user
 post('/quiz/:id/unfavouriting') do
     quiz_id = params[:id]
     if !session[:userId]
